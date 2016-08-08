@@ -25,13 +25,13 @@
 """
 EasyBuild configuration (paths, preferences, etc.)
 
-@author: Stijn De Weirdt (Ghent University)
-@author: Dries Verdegem (Ghent University)
-@author: Kenneth Hoste (Ghent University)
-@author: Pieter De Baets (Ghent University)
-@author: Jens Timmerman (Ghent University)
-@author: Toon Willems (Ghent University)
-@author: Ward Poelmans (Ghent University)
+:author: Stijn De Weirdt (Ghent University)
+:author: Dries Verdegem (Ghent University)
+:author: Kenneth Hoste (Ghent University)
+:author: Pieter De Baets (Ghent University)
+:author: Jens Timmerman (Ghent University)
+:author: Toon Willems (Ghent University)
+:author: Ward Poelmans (Ghent University)
 """
 import copy
 import glob
@@ -93,6 +93,7 @@ BUILD_OPTIONS_CMDLINE = {
         'download_timeout',
         'dump_test_report',
         'easyblock',
+        'extra_modules',
         'filter_deps',
         'hide_deps',
         'from_pr',
@@ -122,6 +123,7 @@ BUILD_OPTIONS_CMDLINE = {
         'test_report_env_filter',
         'testoutput',
         'umask',
+        'zip_logs',
     ],
     False: [
         'add_dummy_to_minimal_toolchains',
@@ -317,7 +319,8 @@ def init_build_options(build_options=None, cmdline_options=None):
             cmdline_options.force = True
             retain_all_deps = True
 
-        auto_ignore_osdeps_options = [cmdline_options.dep_graph, cmdline_options.dry_run, cmdline_options.dry_run_short,
+        auto_ignore_osdeps_options = [cmdline_options.check_conflicts, cmdline_options.dep_graph,
+                                      cmdline_options.dry_run, cmdline_options.dry_run_short,
                                       cmdline_options.extended_dry_run, cmdline_options.dump_env_script]
         if any(auto_ignore_osdeps_options):
             _log.info("Ignoring OS dependencies for --dep-graph/--dry-run")
@@ -503,11 +506,11 @@ def get_log_filename(name, version, add_salt=False, date=None, timestamp=None):
     """
     Generate a filename to be used for logging
 
-    @param name: software name ('%(name)s')
-    @param version: software version ('%(version)s')
-    @param add_salt: add salt (5 random characters)
-    @param date: string representation of date to use ('%(date)s')
-    @param timestamp: timestamp to use ('%(time)s')
+    :param name: software name ('%(name)s')
+    :param version: software version ('%(version)s')
+    :param add_salt: add salt (5 random characters)
+    :param date: string representation of date to use ('%(date)s')
+    :param timestamp: timestamp to use ('%(time)s')
     """
     if date is None:
         date = time.strftime("%Y%m%d")
@@ -541,7 +544,7 @@ def find_last_log(curlog):
     """
     Find location to last log file that is still available.
 
-    @param curlog: location to log file of current session
+    :param curlog: location to log file of current session
     @return: path to last log file (or None if no log files were found)
     """
     variables = ConfigurationVariables()

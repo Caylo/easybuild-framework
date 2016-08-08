@@ -34,8 +34,8 @@ The compiler drivers are quite similar to EB toolchains as they include
 linker and compiler directives to use the Cray libraries for their MPI (and network drivers)
 Cray's LibSci (BLAS/LAPACK et al), FFT library, etc.
 
-@author: Petar Forai (IMP/IMBA, Austria)
-@author: Kenneth Hoste (Ghent University)
+:author: Petar Forai (IMP/IMBA, Austria)
+:author: Kenneth Hoste (Ghent University)
 """
 import copy
 
@@ -137,6 +137,7 @@ class CrayPEGCC(CrayPECompiler):
     def __init__(self, *args, **kwargs):
         """CrayPEGCC constructor."""
         super(CrayPEGCC, self).__init__(*args, **kwargs)
+        self.COMPILER_UNIQUE_OPTION_MAP['openmp'] = 'fopenmp'
         for precflag in self.COMPILER_PREC_FLAGS:
             self.COMPILER_UNIQUE_OPTION_MAP[precflag] = Gcc.COMPILER_UNIQUE_OPTION_MAP[precflag]
 
@@ -149,6 +150,7 @@ class CrayPEIntel(CrayPECompiler):
     def __init__(self, *args, **kwargs):
         """CrayPEIntel constructor."""
         super(CrayPEIntel, self).__init__(*args, **kwargs)
+        self.COMPILER_UNIQUE_OPTION_MAP['openmp'] = 'fopenmp'
         for precflag in self.COMPILER_PREC_FLAGS:
             self.COMPILER_UNIQUE_OPTION_MAP[precflag] = IntelIccIfort.COMPILER_UNIQUE_OPTION_MAP[precflag]
 
@@ -161,6 +163,7 @@ class CrayPEPGI(CrayPECompiler):
     def __init__(self, *args, **kwargs):
         """CrayPEPGI constructor."""
         super(CrayPEPGI, self).__init__(*args, **kwargs)
+        self.COMPILER_UNIQUE_OPTION_MAP['openmp'] = 'mp'
         for precflag in self.COMPILER_PREC_FLAGS:
             self.COMPILER_UNIQUE_OPTION_MAP[precflag] = Pgi.COMPILER_UNIQUE_OPTION_MAP[precflag]
 
@@ -173,5 +176,6 @@ class CrayPECray(CrayPECompiler):
     def __init__(self, *args, **kwargs):
         """CrayPEIntel constructor."""
         super(CrayPECray, self).__init__(*args, **kwargs)
+        self.COMPILER_UNIQUE_OPTION_MAP['openmp'] = 'homp'
         for precflag in self.COMPILER_PREC_FLAGS:
             self.COMPILER_UNIQUE_OPTION_MAP[precflag] = []

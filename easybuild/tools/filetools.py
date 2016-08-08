@@ -25,15 +25,15 @@
 """
 Set of file tools.
 
-@author: Stijn De Weirdt (Ghent University)
-@author: Dries Verdegem (Ghent University)
-@author: Kenneth Hoste (Ghent University)
-@author: Pieter De Baets (Ghent University)
-@author: Jens Timmerman (Ghent University)
-@author: Toon Willems (Ghent University)
-@author: Ward Poelmans (Ghent University)
-@author: Fotis Georgatos (Uni.Lu, NTUA)
-@author: Sotiris Fragkiskos (NTUA, CERN)
+:author: Stijn De Weirdt (Ghent University)
+:author: Dries Verdegem (Ghent University)
+:author: Kenneth Hoste (Ghent University)
+:author: Pieter De Baets (Ghent University)
+:author: Jens Timmerman (Ghent University)
+:author: Toon Willems (Ghent University)
+:author: Ward Poelmans (Ghent University)
+:author: Fotis Georgatos (Uni.Lu, NTUA)
+:author: Sotiris Fragkiskos (NTUA, CERN)
 """
 import fileinput
 import glob
@@ -433,8 +433,8 @@ def compute_checksum(path, checksum_type=DEFAULT_CHECKSUM):
     """
     Compute checksum of specified file.
 
-    @param path: Path of file to compute checksum for
-    @param checksum_type: Type of checksum ('adler32', 'crc32', 'md5' (default), 'sha1', 'size')
+    :param path: Path of file to compute checksum for
+    :param checksum_type: Type of checksum ('adler32', 'crc32', 'md5' (default), 'sha1', 'size')
     """
     if checksum_type not in CHECKSUM_FUNCTIONS:
         raise EasyBuildError("Unknown checksum type (%s), supported types are: %s",
@@ -477,8 +477,8 @@ def verify_checksum(path, checksums):
     """
     Verify checksum of specified file.
 
-    @param file: path of file to verify checksum of
-    @param checksum: checksum value (and type, optionally, default is MD5), e.g., 'af314', ('sha', '5ec1b')
+    :param file: path of file to verify checksum of
+    :param checksum: checksum value (and type, optionally, default is MD5), e.g., 'af314', ('sha', '5ec1b')
     """
     # if no checksum is provided, pretend checksum to be valid
     if checksums is None:
@@ -598,11 +598,11 @@ def det_patched_files(path=None, txt=None, omit_ab_prefix=False, github=False, f
     Determine list of patched files from a patch.
     It searches for "+++ path/to/patched/file" lines to determine
     the patched files.
-    @param path: the path to the diff
-    @param txt: the contents of the diff (either path or txt should be give)
-    @param omit_ab_prefix: ignore the a/ or b/ prefix of the files
-    @param github: only consider lines that start with 'diff --git' to determine list of patched files
-    @param filter_deleted: filter out all files that were deleted by the patch
+    :param path: the path to the diff
+    :param txt: the contents of the diff (either path or txt should be give)
+    :param omit_ab_prefix: ignore the a/ or b/ prefix of the files
+    :param github: only consider lines that start with 'diff --git' to determine list of patched files
+    :param filter_deleted: filter out all files that were deleted by the patch
     """
     if github:
         patched_regex = r"^diff --git (?P<ab_prefix>[ab]/)?(?P<file>\S+)"
@@ -729,8 +729,8 @@ def apply_regex_substitutions(path, regex_subs):
     """
     Apply specified list of regex substitutions.
 
-    @param path: path to file to patch
-    @param regex_subs: list of substitutions to apply, specified as (<regexp pattern>, <replacement string>)
+    :param path: path to file to patch
+    :param regex_subs: list of substitutions to apply, specified as (<regexp pattern>, <replacement string>)
     """
     # only report when in 'dry run' mode
     if build_option('extended_dry_run'):
@@ -744,10 +744,14 @@ def apply_regex_substitutions(path, regex_subs):
         for i, (regex, subtxt) in enumerate(regex_subs):
             regex_subs[i] = (re.compile(regex), subtxt)
 
-        for line in fileinput.input(path, inplace=1, backup='.orig.eb'):
-            for regex, subtxt in regex_subs:
-                line = regex.sub(subtxt, line)
-            sys.stdout.write(line)
+        try:
+            for line in fileinput.input(path, inplace=1, backup='.orig.eb'):
+                for regex, subtxt in regex_subs:
+                    line = regex.sub(subtxt, line)
+                sys.stdout.write(line)
+
+        except OSError, err:
+            raise EasyBuildError("Failed to patch %s: %s", path, err)
 
 
 def modify_env(old, new):
@@ -887,9 +891,9 @@ def mkdir(path, parents=False, set_gid=None, sticky=None):
     Create a directory
     Directory is the path to create
 
-    @param parents: create parent directories if needed (mkdir -p)
-    @param set_gid: set group ID bit, to make subdirectories and files inherit group
-    @param sticky: set the sticky bit on this directory (a.k.a. the restricted deletion flag),
+    :param parents: create parent directories if needed (mkdir -p)
+    :param set_gid: set group ID bit, to make subdirectories and files inherit group
+    :param sticky: set the sticky bit on this directory (a.k.a. the restricted deletion flag),
                    to avoid users can removing/renaming files in this directory
     """
     if set_gid is None:
@@ -1008,6 +1012,9 @@ def rmtree2(path, n=3):
 
 def move_logs(src_logfile, target_logfile):
     """Move log file(s)."""
+
+    zip_log_cmd = build_option('zip_logs')
+
     mkdir(os.path.dirname(target_logfile), parents=True)
     src_logfile_len = len(src_logfile)
     try:
@@ -1032,6 +1039,10 @@ def move_logs(src_logfile, target_logfile):
             shutil.move(app_log, new_log_path)
             _log.info("Moved log file %s to %s" % (src_logfile, new_log_path))
 
+            if zip_log_cmd:
+                run.run_cmd("%s %s" % (zip_log_cmd, new_log_path))
+                _log.info("Zipped log %s using '%s'", new_log_path, zip_log_cmd)
+
     except (IOError, OSError), err:
         raise EasyBuildError("Failed to move log file(s) %s* to new log file %s*: %s",
                              src_logfile, target_logfile, err)
@@ -1041,10 +1052,10 @@ def cleanup(logfile, tempdir, testing, silent=False):
     """
     Cleanup the specified log file and the tmp directory, if desired.
 
-    @param logfile: path to log file to clean up
-    @param tempdir: path to temporary directory to clean up
-    @param testing: are we in testing mode? if so, don't actually clean up anything
-    @param silent: be silent (don't print anything to stdout)
+    :param logfile: path to log file to clean up
+    :param tempdir: path to temporary directory to clean up
+    :param testing: are we in testing mode? if so, don't actually clean up anything
+    :param silent: be silent (don't print anything to stdout)
     """
 
     if build_option('cleanup_tmpdir') and not testing:
@@ -1236,8 +1247,8 @@ def find_flexlm_license(custom_env_vars=None, lic_specs=None):
 
     If no license is found through environment variables, also consider 'lic_specs'.
 
-    @param custom_env_vars: list of environment variables to considered (if None, only consider $LM_LICENSE_FILE)
-    @param lic_specs: list of license specifications
+    :param custom_env_vars: list of environment variables to considered (if None, only consider $LM_LICENSE_FILE)
+    :param lic_specs: list of license specifications
     @return: tuple with list of valid license specs found and name of first valid environment variable
     """
     valid_lic_specs = []

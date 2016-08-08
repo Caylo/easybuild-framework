@@ -25,8 +25,8 @@
 """
 Toolchain specific variables
 
-@author: Stijn De Weirdt (Ghent University)
-@author: Kenneth Hoste (Ghent University)
+:author: Stijn De Weirdt (Ghent University)
+:author: Kenneth Hoste (Ghent University)
 """
 
 from easybuild.tools.variables import AbsPathList
@@ -179,9 +179,11 @@ FFT_MAP_CLASS = {
     ],
     LibraryList: [
         ('LIBFFT', 'FFT libraries'),
+        ('LIBFFT_MT', 'Multithreaded FFT libraries'),
     ],
     CommaStaticLibs: [
         ('FFT_STATIC_LIBS', 'Comma-separated list of static FFT libraries'),
+        ('FFT_STATIC_LIBS_MT', 'Comma-separated list of static multithreaded FFT libraries'),
     ],
 }
 
